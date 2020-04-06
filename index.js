@@ -30,8 +30,9 @@ app.use(xss());
 // Prevents parameter pollution.
 app.use(hpp());
 
-app.get("/", function(req, res) {
-	res.send("App works!!");
+// Main API call
+app.get("/api/v1/*", function(req, res) {
+	res.send(`App works!! ${JSON.stringify(req.params[0])}`);
 });
 
 app.get("*", function(req, res) {
