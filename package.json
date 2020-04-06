@@ -16,6 +16,7 @@
     "express-rate-limit": "^5.1.1",
     "helmet": "^3.22.0",
     "hpp": "^0.2.3",
+    "node-fetch": "^2.6.0",
     "xss": "^1.0.6",
     "xss-clean": "^0.1.1"
   },

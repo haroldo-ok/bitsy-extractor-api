@@ -4,7 +4,8 @@ const
 	helmet = require("helmet"),
 	xss = require("xss-clean"),
 	hpp = require("hpp"),
-	cors = require("cors");
+	cors = require("cors"),
+	fetch = require("node-fetch");
 	
 const 
 	app = express(),
@@ -31,8 +32,20 @@ app.use(xss());
 app.use(hpp());
 
 // Main API call
-app.get("/api/v1/*", function(req, res) {
-	res.send(`App works!! ${JSON.stringify(req.params[0])}`);
+app.get("/api/v1/*", async function(req, res) {
+	const remoteURL = `http://${req.params[0]}`;
+	
+	try {
+		const response = await fetch(remoteURL);
+		const responseText = await response.text();
+
+		res.setHeader('Content-Type', 'text/plain');
+		res.send(responseText);
+	} catch (e) {
+		console.error(`Error when accessing ${remoteURL}`, e);
+		res.status(500);
+		res.send(e.message);
+	}
 });
 
 app.get("*", function(req, res) {
