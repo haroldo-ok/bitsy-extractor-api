@@ -54,6 +54,11 @@ const extractIframeSrc = $ => {
 	return $iframe('iframe').attr('src');
 }
 
+const extractBitsyText = $ => {
+	const $bitsyScript = $('script[type="text/bitsyGameData"]');
+	return $bitsyScript.html().replace(/^\n/, '');	
+}
+
 // Main API route
 app.get("/api/v1/*", async function(req, res) {
 	const remoteURL = `http://${req.params[0]}`;
@@ -64,13 +69,23 @@ app.get("/api/v1/*", async function(req, res) {
 		
 		const $ = cheerio.load(mainPage);
 		const src = extractIframeSrc($);
-				
-		const gameURL = `http:${src}`;
-		const gamePage = await fetchText(gameURL);
 		
-		const $game = cheerio.load(gamePage);
-		const $bitsyScript = $game('script[type="text/bitsyGameData"]');
-		const scriptText = $bitsyScript.html().replace(/^\n/, '');
+		let scriptText;
+		
+		if (src) {
+			const gameURL = `http:${src}`;
+			const gamePage = await fetchText(gameURL);
+
+			const $game = cheerio.load(gamePage);
+			scriptText = extractBitsyText($game);
+		} else {
+			// FIXME: Causes the error "Cannot read property 'parent' of undefined"
+			scriptText = extractBitsyText($);	
+		}
+		
+		if (!scriptText) {
+			throw new Error('Bitsy script not found.');
+		}
 		
 		res.setHeader('Content-Type', 'text/plain');
 		res.send(scriptText);
