@@ -4,11 +4,24 @@
   "description": "Extracts Bitsy scripts from itch.io URLs.",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "start:dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Haroldo de Oliveira Pinheiro",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1"
+    "cheerio": "^1.0.0-rc.3",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-rate-limit": "^5.1.1",
+    "helmet": "^3.22.0",
+    "hpp": "^0.2.3",
+    "node-fetch": "^2.6.0",
+    "xss": "^1.0.6",
+    "xss-clean": "^0.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
   }
 }
