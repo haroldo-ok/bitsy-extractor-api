@@ -5,7 +5,8 @@ const
 	xss = require("xss-clean"),
 	hpp = require("hpp"),
 	cors = require("cors"),
-	fetch = require("node-fetch");
+	fetch = require("node-fetch"),
+	cheerio = require("cheerio");
 	
 const 
 	app = express(),
@@ -31,16 +32,34 @@ app.use(xss());
 // Prevents parameter pollution.
 app.use(hpp());
 
-// Main API call
+
+// Actions to perform
+
+
+const fetchText = async (url) => {
+	const response = await fetch(url);
+	const responseText = await response.text();
+	return responseText;
+};
+
+const extractIframeSrc = $ => { 
+	const iframe = $('.game_frame [data-iframe]').attr('data-iframe')
+	const $iframe = cheerio.load(iframe);
+	return $iframe('iframe').attr('src');
+}
+
+// Main API route
 app.get("/api/v1/*", async function(req, res) {
 	const remoteURL = `http://${req.params[0]}`;
 	
 	try {
-		const response = await fetch(remoteURL);
-		const responseText = await response.text();
+		const responseText = await fetchText(remoteURL);
+		
+		const $ = cheerio.load(responseText);
+		const src = extractIframeSrc($);
 
 		res.setHeader('Content-Type', 'text/plain');
-		res.send(responseText);
+		res.send(src);
 	} catch (e) {
 		console.error(`Error when accessing ${remoteURL}`, e);
 		res.status(500);
