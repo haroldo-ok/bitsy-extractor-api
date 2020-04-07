@@ -33,13 +33,19 @@ app.use(xss());
 app.use(hpp());
 
 
-// Actions to perform
+// Functions
 
 
 const fetchText = async (url) => {
-	const response = await fetch(url);
-	const responseText = await response.text();
-	return responseText;
+	try {
+		const response = await fetch(url);
+		const responseText = await response.text();
+		return responseText;
+	} catch (e) {
+		const msg = `Error fetching URL "${url}": ${e.message}`;
+		console.warn(msg, e);
+		throw new Error(msg);
+	}
 };
 
 const extractIframeSrc = $ => { 
@@ -51,17 +57,25 @@ const extractIframeSrc = $ => {
 // Main API route
 app.get("/api/v1/*", async function(req, res) {
 	const remoteURL = `http://${req.params[0]}`;
+	let accessedURL;
 	
 	try {
-		const responseText = await fetchText(remoteURL);
+		const mainPage = await fetchText(remoteURL);
 		
-		const $ = cheerio.load(responseText);
+		const $ = cheerio.load(mainPage);
 		const src = extractIframeSrc($);
-
+				
+		const gameURL = `http:${src}`;
+		const gamePage = await fetchText(gameURL);
+		
+		const $game = cheerio.load(gamePage);
+		const $bitsyScript = $game('script[type="text/bitsyGameData"]');
+		const scriptText = $bitsyScript.html().replace(/^\n/, '');
+		
 		res.setHeader('Content-Type', 'text/plain');
-		res.send(src);
+		res.send(scriptText);
 	} catch (e) {
-		console.error(`Error when accessing ${remoteURL}`, e);
+		console.error(e);
 		res.status(500);
 		res.send(e.message);
 	}
