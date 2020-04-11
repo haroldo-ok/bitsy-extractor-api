@@ -16,7 +16,7 @@
 
 ### 🏠 [Homepage](https://github.com/haroldo-ok/bitsy-extractor-api)
 
-### ✨ [Demo](https://github.com/haroldo-ok/bitsy-extractor-api)
+### ✨ [Demo](http://bitsy-extractor-api.herokuapp.com/api/v1/fontainepen.itch.io/red-dog-and-the-endless-spaceship)
 
 ## Install
 
