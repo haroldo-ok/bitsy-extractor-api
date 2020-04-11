@@ -10,7 +10,7 @@ const
 	
 const 
 	app = express(),
-	port = 3070;
+	port = process.env.PORT || 3070;
 
 // Allows cross-origin requests
 app.use(cors());
